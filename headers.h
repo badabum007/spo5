@@ -16,7 +16,12 @@
 	#include <unistd.h>
 	#include <termios.h>
 	#include <aio.h>
-	#define PLATFORM PLATFORM_UNIX 
+	#include <sys/wait.h>
+	#include <sys/types.h>
+	#define maxFileSize 500
+	#define PLATFORM PLATFORM_UNIX
+	char buf[maxFileSize];
+	struct aiocb aiocb_; 
 #endif 
 
 struct Data 
@@ -25,17 +30,18 @@ struct Data
 	CRITICAL_SECTION CriticalSection;
 	HANDLE ThreadId;
 	#else
-	pthread_t reader, writer;	
-	pthread_mutex_t mutex;
+	pthread_t reader, writer;
+	int readerStatus, writerStatus;	
+	pthread_mutex_t mutexRead, mutexWrite;
 	#endif
 	int argc;
 	char** argv;
 };
 
 void createReader(struct Data*);
-void createWriter(struct Data*);
+//void createWriter(struct Data*);
 void* readFiles(void* );
-void* writeFiles(void* );
+//void* writeFiles(void* );
 
 void createSignalObject(struct Data*);
 void closeSignalObject(struct Data*);

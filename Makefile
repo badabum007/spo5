@@ -26,7 +26,7 @@ output: laba_unix.o main.o
 	$(CC) laba_unix.o main.o -o lab $(LIN_LIBS)
 	
 laba_unix.o: laba_unix.c
-	$(CC) $(CFLAGS) laba_unix.c $(LIN_LIBS)
+	$(CC) $(CFLAGS) laba_unix.c
 	
 main.o: main.c
 	$(CC) $(CFLAGS)  main.c
