@@ -1,4 +1,3 @@
-#define _CRT_SECURE_NO_WARNINGS
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -18,10 +17,12 @@
 	#include <aio.h>
 	#include <sys/wait.h>
 	#include <sys/types.h>
+	#include <dlfcn.h>
 	#define maxFileSize 500
+	#define libNameSize 80
 	#define PLATFORM PLATFORM_UNIX
 	char buf[maxFileSize];
-	struct aiocb aiocb_; 
+	struct aiocb aiocb_;
 #endif 
 
 struct Data 
@@ -31,17 +32,19 @@ struct Data
 	HANDLE ThreadId;
 	#else
 	pthread_t reader, writer;
-	int readerStatus, writerStatus;	
+	int readerStatus;	
 	pthread_mutex_t mutexRead, mutexWrite;
+	void* handle;
 	#endif
 	int argc;
 	char** argv;
+	char libName[libNameSize];
 };
 
 void createReader(struct Data*);
-//void createWriter(struct Data*);
-void* readFiles(void* );
-//void* writeFiles(void* );
+void dynLabOpen(struct Data*);
+void dynLabClose(struct Data*);
+void callWriteFiles(struct Data*);
 
 void createSignalObject(struct Data*);
 void closeSignalObject(struct Data*);

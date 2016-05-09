@@ -1,7 +1,8 @@
 CC 			= gcc
 CFLAGS 		= -c -Wall -pedantic
 STAND 		= -std=gnu99
-LIN_LIBS 	= -pthread -lrt
+SHARED_LIB_DEPS 	= -pthread -lrt -shared
+LIN_PROG_DEPS = -ldl -pthread
 
 ifeq ($(OS), Windows_NT)
 
@@ -20,15 +21,24 @@ main.o: main.c
 	$(CC) $(CFLAGS) $(STAND) main.c 
 else
 
-all: output
+all: fileconcat.so output
 
-output: laba_unix.o main.o 
-	$(CC) laba_unix.o main.o -o lab $(LIN_LIBS)
+output: main.o laba_unix.o
+	$(CC) main.o laba_unix.o -o lab $(LIN_PROG_DEPS)
+
+fileconcat.so: fileconcat.o 
+	$(CC) $(SHARED_LIB_DEPS) fileconcat.o -o fileconcat.so
 	
+fileconcat.o: fileconcat.c
+	$(CC) $(CFLAGS) fileconcat.c -fPIC
+
 laba_unix.o: laba_unix.c
 	$(CC) $(CFLAGS) laba_unix.c
 	
 main.o: main.c
 	$(CC) $(CFLAGS)  main.c
+
+clean:
+	rm -f *.o *.so lab
 	
 endif
