@@ -30,7 +30,7 @@ struct Data
 	CRITICAL_SECTION readerSection, writerSection;
 	HANDLE readerId;
 	OVERLAPPED overRead, overWrite;
-	char readerEventName[nameStringSize], writerEventName[nameStringSize];
+	TCHAR readerEventName[nameStringSize], writerEventName[nameStringSize];
 	#else
 	pthread_t reader, writer;
 	pthread_mutex_t mutexRead, mutexWrite;

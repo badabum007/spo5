@@ -61,9 +61,9 @@ void callWriteFiles(struct Data* data)
 
 	for(int i = 2; i < data->argc; i++) {
 		EnterCriticalSection(&(data->writerSection));
-		WaitForSingleObject(data->overRead.hEvent, INFINITE);	
-		data->overWrite.Offset = len;
+		WaitForSingleObject(data->overRead.hEvent, INFINITE);
 		len += strlen(buf);
+		data->overWrite.Offset = len;
 		puts(buf);
 		WriteFile(hFile, buf, strlen(buf), NULL,  &(data->overWrite));
 		LeaveCriticalSection(&(data->readerSection));
