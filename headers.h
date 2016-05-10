@@ -43,9 +43,14 @@ struct Data
 };
 
 void createReader(struct Data*);
-void dynLabOpen(struct Data*);
-void dynLabClose(struct Data*);
+//void dynLabOpen(struct Data*);
+//void dynLabClose(struct Data*);
 void callWriteFiles(struct Data*);
 
 void createSignalObject(struct Data*);
 void closeSignalObject(struct Data*);
+
+#if PLATFORM == PLATFORM_WIN)
+HANDLE createEvent(TCHAR* overlappedEventName);
+unsigned  __stdcall readFiles(PVOID data_temp)
+#endif
