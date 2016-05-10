@@ -3,7 +3,7 @@ CFLAGS 		= -c -Wall -pedantic
 STAND 		= -std=gnu99
 SHARED_LIB_DEPS 	= -pthread -lrt -shared
 LIN_PROG_DEPS = -ldl -pthread
-WIN_PROG_DEPS = -shared --enable-runtime-pseudo-reloc
+WIN_PROG_DEPS = -shared --no-undefined --enable-runtime-pseudo-reloc
 
 ifeq ($(OS), Windows_NT)
 

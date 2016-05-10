@@ -1,17 +1,32 @@
 #include "headers.h"
 
+unsigned __stdcall readCall(void* data_tmp)
+{
+	typedef void (*readFiles) (struct Data*);
+	struct Data* data;
+	data = (struct Data*)data_tmp;
+	readFiles readfiles;
+	puts("gut");
+	readfiles = (readFiles)GetProcAddress(data->lib, "readFiles");
+	readfiles(data);
+	puts("omg");
+	ExitThread(data->readerStatus);
+}
+
 void createReader(struct Data *data)
 {	
 	strcpy(data->readerEventName, "ReadEvent");
 	strcpy(data->writerEventName, "WriteEvent");
 	ZeroMemory(&(data->overRead), sizeof(OVERLAPPED));
 	ZeroMemory(&(data->overWrite), sizeof(OVERLAPPED));
+
 	data->overRead.hEvent = createEvent(data->readerEventName);
 	data->overWrite.hEvent = createEvent(data->writerEventName);
 	SetEvent(data->overWrite.hEvent);
+	//readfiles((PVOID)data);
 
 	HANDLE hand;
-	hand = (HANDLE)_beginthreadex( NULL, 0, readFiles, (PVOID)data, 0, NULL);
+	hand = (HANDLE)_beginthreadex( NULL, 0, readCall, (void*)data, 0, NULL);
 	data->readerId = hand;
 }
 
@@ -33,7 +48,7 @@ void createSignalObject(struct Data *data)
 	InitializeCriticalSection(&(data->writerSection));
 	EnterCriticalSection(&(data->writerSection));
 	data->readerStatus = 0;
-	strcpy(data->libName, "./fileconcat.so");
+	strcpy(data->libName, "fileconcat.dll");
 }
 
 void closeSignalObject(struct Data *data)
@@ -42,50 +57,20 @@ void closeSignalObject(struct Data *data)
 	DeleteCriticalSection(&(data->writerSection));
 }
 
-/*void dynLabOpen(struct Data* data)
+void dynLabOpen(struct Data* data)
 {
-	data->handle = dlopen(data->libName, RTLD_LAZY);
+	data->lib = LoadLibrary(data->libName);
 }
 
 void dynLabClose(struct Data* data)
 {
-	dlclose(data->handle);
-}*/
+	FreeLibrary(data->lib);
+}
 
 void callWriteFiles(struct Data* data)
 {
-	HANDLE hFile;
-	hFile = CreateFile(data->argv[data->argc - 1], GENERIC_WRITE, 
-		0, NULL, CREATE_ALWAYS, FILE_FLAG_OVERLAPPED, NULL);
-	DWORD len = 0;
-
-	for(int i = 2; i < data->argc; i++) {
-		EnterCriticalSection(&(data->writerSection));
-		WaitForSingleObject(data->overRead.hEvent, INFINITE);
-		len += strlen(buf);
-		data->overWrite.Offset = len;
-		puts(buf);
-		WriteFile(hFile, buf, strlen(buf), NULL,  &(data->overWrite));
-		LeaveCriticalSection(&(data->readerSection));
-	}
-	CloseHandle(hFile);	
-}
-
-unsigned  __stdcall readFiles(PVOID data_tmp)
-{
-	struct Data* data;
-	data = (struct Data*)data_tmp;
-	HANDLE hFile;
-
-	for(int i = 2; i < data->argc; i++) {
-		EnterCriticalSection(&(data->readerSection));
-		WaitForSingleObject(data->overWrite.hEvent, INFINITE);
-		hFile = CreateFile(data->argv[i-1], GENERIC_READ, 
-		0, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
-		memset((void*)buf, 0, sizeof(buf));
-		ReadFile(hFile, buf, maxFileSize, NULL, &(data->overRead));
-		LeaveCriticalSection(&(data->writerSection));
-		CloseHandle(hFile);
-	}
-	ExitThread(data->readerStatus);
+	typedef void (*writeFiles) (struct Data*);
+	writeFiles writefiles;
+	writefiles = (writeFiles)GetProcAddress(data->lib, "writeFiles");
+	writefiles(data);
 }
