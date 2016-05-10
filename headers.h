@@ -8,7 +8,6 @@
 #if defined(_WIN32) || defined(_WIN64) 
 	#include <windows.h>
 	#include <process.h>
-	#include <conio.h> 
 	#define PLATFORM PLATFORM_WIN 
 #else 
 	#include <pthread.h>
@@ -18,18 +17,20 @@
 	#include <sys/wait.h>
 	#include <sys/types.h>
 	#include <dlfcn.h>
-	#define maxFileSize 500
-	#define libNameSize 80
 	#define PLATFORM PLATFORM_UNIX
-	char buf[maxFileSize];
 	struct aiocb aiocb_;
-#endif 
+#endif
+	#define maxFileSize 500
+	#define nameStringSize 80 
+	char buf[maxFileSize];
 
 struct Data 
 {
 	#if PLATFORM == PLATFORM_WIN
-	CRITICAL_SECTION CriticalSection;
-	HANDLE ThreadId;
+	CRITICAL_SECTION readerSection, writerSection;
+	HANDLE readerId;
+	OVERLAPPED overRead, overWrite;
+	TCHAR readerEventName[nameStringSize], writerEventName[nameStringSize];
 	#else
 	pthread_t reader, writer;
 	int readerStatus;	
@@ -38,7 +39,7 @@ struct Data
 	#endif
 	int argc;
 	char** argv;
-	char libName[libNameSize];
+	char libName[nameStringSize];
 };
 
 void createReader(struct Data*);

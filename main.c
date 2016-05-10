@@ -13,10 +13,10 @@ int main(int argc, char** argv)
 	data.argv = argv;
 
 	createSignalObject(&data);
-	dynLabOpen(&data);
+	//dynLabOpen(&data);
 	createReader(&data);
 	callWriteFiles(&data);
-	dynLabClose(&data);
+	//dynLabClose(&data);
 	closeSignalObject(&data);
 	return 0;
 }
