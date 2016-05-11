@@ -1,2 +1,2 @@
 ./lab res/file1.txt res/file2.txt res/file3.txt res/file4.txt res/file5.txt res/outputfile.txt
-#cat res/outputfile.txt
+cat res/outputfile.txt
